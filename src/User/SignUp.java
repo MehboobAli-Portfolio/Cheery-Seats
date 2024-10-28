@@ -45,18 +45,18 @@ public class SignUp extends javax.swing.JFrame {
         jLabel1.setText("Sign Up");
 
         jLabel2.setFont(new java.awt.Font("Snap ITC", 1, 14)); // NOI18N
-        jLabel2.setText("User Name");
+        jLabel2.setText("User Name *");
 
         jLabel3.setFont(new java.awt.Font("Snap ITC", 1, 14)); // NOI18N
-        jLabel3.setText("Email");
+        jLabel3.setText("Email *");
 
         jLabel4.setFont(new java.awt.Font("Snap ITC", 1, 14)); // NOI18N
-        jLabel4.setText("Password");
+        jLabel4.setText("Password *");
 
         PL.setForeground(new java.awt.Color(255, 0, 0));
 
         jLabel6.setFont(new java.awt.Font("Snap ITC", 1, 14)); // NOI18N
-        jLabel6.setText("Confirm Password");
+        jLabel6.setText("Confirm Password *");
 
         Sign_Up.setFont(new java.awt.Font("Snap ITC", 1, 14)); // NOI18N
         Sign_Up.setText("Sign Up");
@@ -89,11 +89,11 @@ public class SignUp extends javax.swing.JFrame {
                             .addComponent(jLabel4)
                             .addComponent(jTextField1)
                             .addComponent(jTextField2)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel2)
                             .addComponent(jTextField3)
                             .addComponent(PL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(UL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(UL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel3))))
                 .addContainerGap(66, Short.MAX_VALUE))
         );
         ETLayout.setVerticalGroup(
@@ -144,74 +144,78 @@ public class SignUp extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void Sign_UpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Sign_UpActionPerformed
-        String username = jTextField2.getText().trim();
-        String email = jTextField1.getText().trim();
-        String password = jTextField3.getText();
-        String confirmPassword = jTextField4.getText();
+    // Retrieve input values
+    String username = jTextField2.getText().trim();
+    String email = jTextField1.getText().trim();
+    String password = jTextField3.getText().trim();
+    String confirmPassword = jTextField4.getText().trim();
 
-        // Validation flags
-        boolean isValid = true;
-        StringBuilder validationMessage = new StringBuilder();
+    // Validation flags
+    boolean isValid = true;
+    StringBuilder validationMessage = new StringBuilder();
 
-        // Clear previous error messages
-        UL.setText("");
-        EL.setText("");
-        PL.setText("");
-        // Validate Username: Should be between 3 and 25 characters
-        if (username.isEmpty()) {
+    // Clear previous error messages
+    UL.setText("");
+    EL.setText("");
+    PL.setText("");
+
+    // Validate Username: Should be between 3 and 25 alphanumeric characters
+    if (username.isEmpty()) {
+        isValid = false;
+        UL.setText("<html>Username cannot be empty.</html>");
+    } else if (!username.matches("^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]{3,25}$")) {
+        isValid = false;
+        UL.setText("<html>Username must be 3-25 characters<br> containing letters and at least one number.</html>");
+    }
+
+    // Validate Email: Must be a valid Gmail address
+    if (email.isEmpty()) {
+        isValid = false;
+        EL.setText("<html>Email field cannot be empty.</html>");
+    } else {
+        String emailRegex = "^[A-Za-z0-9]+@gmail\\.com$";
+        if (!email.matches(emailRegex)) {
             isValid = false;
-            UL.setText("<html>Username cannot be empty.</html>");
-        } else if (username.length() < 3 || username.length() > 25) {
-            isValid = false;
-            UL.setText("<html>Username must be between 3 and 25 characters.</html>");
+            EL.setText("<html>Email must be a valid Gmail<br> address (e.g., example@gmail.com).</html>");
         }
+    }
 
-        // Validate Email: Must not be empty and must be a valid Gmail address
-        if (email.isEmpty()) {
-            isValid = false;
-            EL.setText("<html>Email field cannot be empty.</html>");
-        } else {
-            String emailRegex = "^[A-Za-z0-9]+@gmail\\.com$";
-            if (!email.matches(emailRegex)) {
-                isValid = false;
-                EL.setText("<html>Email must be a valid Gmail<br> address (e.g., example@gmail.com).</html>");
-            }
-        }
+    // Validate Password strength
+    if (!password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$")) {
+        isValid = false;
+        PL.setText("<html>Password must have at least 8 characters:<br>• 1 lowercase & 1 uppercase letter<br>• 1 number & 1 special character</html>");
+    }
 
-        // Validate Password strength
-        if (!password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$")) {
-            isValid = false;
-            PL.setText("<html>Password must have at least 8 characters:<br>• At least 1 lowercase and 1 uppercase letter<br>• At least 1 number and 1 special character</html>");
-        }
+    // Confirm Password
+    if (!password.equals(confirmPassword)) {
+        isValid = false;
+        validationMessage.append("Passwords do not match.<br>");
+    }
 
-        // Confirm Password: Must match the password
-        if (!password.equals(confirmPassword)) {
-            isValid = false;
-            validationMessage.append("Passwords do not match.<br>");
-        }
-        // Check if all validations passed
-        if (isValid) {
+    // Check if all validations passed
+    if (isValid) {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cheery seats", "root", "")) {
-                // Create statement for executing the SQL commands
-                Statement stmt = con.createStatement();
-                
-                // Insert into stdinfo, excluding the auto-incremented User_ID
-                String insertQuery = "INSERT INTO User (User_Name, User_Email, Password) VALUES ('" + username + "', '" + email + "', '" + password + "')";
-                stmt.executeUpdate(insertQuery); // Execute the insert
+            // Singleton Database Connection Instance
+            Connection con = DatabaseConnection.getInstance().getConnection();
 
+            // Use PreparedStatement for SQL injection safety
+            String insertQuery = "INSERT INTO User (User_Name, User_Email, Password) VALUES (?, ?, ?)";
+            try (PreparedStatement pstmt = con.prepareStatement(insertQuery)) {
+                pstmt.setString(1, username);
+                pstmt.setString(2, email);
+                pstmt.setString(3, password);
+                pstmt.executeUpdate();
 
                 // Registration successful
                 javax.swing.JOptionPane.showMessageDialog(this, "Sign-up successful!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-                SignIn si=new SignIn();
+                SignIn si = new SignIn();
                 si.setVisible(true);
                 this.dispose();
             } catch (SQLException e) {
                 System.out.println("SQL Exception: " + e.getMessage());
             }
-        } catch (ClassNotFoundException e) {
-            System.out.println("MySQL JDBC Driver not found.");
+        } catch (Exception e) {
+            System.out.println("Database connection error.");
         }
     } else {
         // Show validation errors if any
@@ -220,7 +224,6 @@ public class SignUp extends javax.swing.JFrame {
         }
     }
 
-        
 
     }//GEN-LAST:event_Sign_UpActionPerformed
 

@@ -1,4 +1,5 @@
 import User.*;
+import Admin.*;
 public class Loading extends javax.swing.JFrame {
 
     /**
@@ -29,6 +30,7 @@ public class Loading extends javax.swing.JFrame {
         jButton1.setFont(new java.awt.Font("Snap ITC", 1, 18)); // NOI18N
         jButton1.setText("User");
         jButton1.setBorder(null);
+        jButton1.setFocusable(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -45,7 +47,7 @@ public class Loading extends javax.swing.JFrame {
         });
 
         jLabel1.setFont(new java.awt.Font("Snap ITC", 1, 24)); // NOI18N
-        jLabel1.setText("Cherry Seats");
+        jLabel1.setText("Cheery Seats");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -58,7 +60,7 @@ public class Loading extends javax.swing.JFrame {
                     .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(114, Short.MAX_VALUE)
+                .addContainerGap(113, Short.MAX_VALUE)
                 .addComponent(jLabel1)
                 .addGap(94, 94, 94))
         );
@@ -98,6 +100,9 @@ public class Loading extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
+        Login l=new Login();
+        l.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
