@@ -242,13 +242,54 @@ public class First_Page extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+        // Get Event ID from the text field
+    String eventId = jTextField1.getText().trim();
+
+    if (eventId.isEmpty()) {
+        SL.setText("Event ID cannot be empty.");
+        return;
+    }
+
+    try {
+        // Use Singleton instance for database connection
+        Connection con = DatabaseConnection.getInstance().getConnection();
+        
+        // Prepare SQL query to fetch event details by Event ID
+        String query = "SELECT * FROM Events WHERE Event_ID = ?";
+        try (PreparedStatement pstmt = con.prepareStatement(query)) {
+            pstmt.setString(1, eventId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                // Displaying the fetched details of the event
+                String eventName = rs.getString("Event_Name");
+                String eventType = rs.getString("Event_Type");
+                String eventDate = rs.getString("Event_Date");
+                String eventDescription = rs.getString("Event_Description");
+                String userId = rs.getString("User_ID");
+                int ticketCount = rs.getInt("Ticket_Count");
+                // Update the SL label to display event details
+                SL.setText("<html><b>Event Name:</b> " + eventName + "<br>" +
+                           "<b>Type:</b> " + eventType + "<br>" +
+                           "<b>Date:</b> " + eventDate + "<br>" +
+                           "<b>Description:</b> " + eventDescription + "<br>" +
+                           "<b>Created by User ID:</b> " + userId + "<br>" +
+                           "<b>Total Tickets:</b> " + ticketCount +"</html>");
+            } else {
+                SL.setText("No event found with Event ID: " + eventId);
+            }
+        }
+    } catch (SQLException e) {
+        System.out.println("SQL Exception: " + e.getMessage());
+        SL.setText("Database error. Please try again later.");
+    }
         
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
         // TODO add your handling code here:
         MY_Events me=new MY_Events(User_Name,id);
-        me.setVisible(rootPaneCheckingEnabled);
+        me.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton9ActionPerformed
 
