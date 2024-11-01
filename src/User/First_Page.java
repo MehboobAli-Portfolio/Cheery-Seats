@@ -14,6 +14,7 @@ public class First_Page extends javax.swing.JFrame {
         initComponents();
         jLabel1.setText("User_Name:"+User_Name);
         jLabel2.setText("ID:"+id);
+        
     }
     public First_Page() {
         initComponents();
@@ -85,13 +86,18 @@ public class First_Page extends javax.swing.JFrame {
             }
         });
 
-        jButton2.setText("My Tickets");
+        jButton2.setText("Buy Tickets");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel6.setText("Enter Event ID");
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel3.setText("Brows by Category");
+        jLabel3.setText("Brows by Category &  buy ");
 
         jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel8.setText("Cheery Seats");
@@ -100,6 +106,11 @@ public class First_Page extends javax.swing.JFrame {
         jLabel9.setText("Discover Amazing Events");
 
         jButton5.setText("Music");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
 
         jButton6.setText("Sports");
         jButton6.addActionListener(new java.awt.event.ActionListener() {
@@ -109,8 +120,18 @@ public class First_Page extends javax.swing.JFrame {
         });
 
         jButton7.setText("Art ");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
 
         jButton8.setText("Family");
+        jButton8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton8ActionPerformed(evt);
+            }
+        });
 
         jButton9.setText("My Events");
         jButton9.addActionListener(new java.awt.event.ActionListener() {
@@ -154,8 +175,8 @@ public class First_Page extends javax.swing.JFrame {
                             .addComponent(jLabel6)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel8)
-                                .addGap(18, 18, 18)
-                                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jButton4)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -168,12 +189,13 @@ public class First_Page extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8)
-                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton4)
-                    .addComponent(jButton9)
-                    .addComponent(jButton2))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel8)
+                        .addComponent(jButton4)
+                        .addComponent(jButton9)
+                        .addComponent(jButton2)))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -189,8 +211,8 @@ public class First_Page extends javax.swing.JFrame {
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(SL, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addComponent(SL, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel3)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -198,7 +220,7 @@ public class First_Page extends javax.swing.JFrame {
                     .addComponent(jButton6)
                     .addComponent(jButton7)
                     .addComponent(jButton8))
-                .addContainerGap(74, Short.MAX_VALUE))
+                .addGap(33, 33, 33))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -238,6 +260,9 @@ public class First_Page extends javax.swing.JFrame {
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         // TODO add your handling code here:
+        Brows_by_Category_and_Buy bbc= new Brows_by_Category_and_Buy(User_Name,id,"Sports");
+        bbc.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -267,6 +292,7 @@ public class First_Page extends javax.swing.JFrame {
                 String eventDate = rs.getString("Event_Date");
                 String eventDescription = rs.getString("Event_Description");
                 String userId = rs.getString("User_ID");
+                String Ticket_Price = rs.getString("Ticket_Price");
                 int ticketCount = rs.getInt("Ticket_Count");
                 // Update the SL label to display event details
                 SL.setText("<html><b>Event Name:</b> " + eventName + "<br>" +
@@ -274,7 +300,8 @@ public class First_Page extends javax.swing.JFrame {
                            "<b>Date:</b> " + eventDate + "<br>" +
                            "<b>Description:</b> " + eventDescription + "<br>" +
                            "<b>Created by User ID:</b> " + userId + "<br>" +
-                           "<b>Total Tickets:</b> " + ticketCount +"</html>");
+                           "<b>Total Tickets:</b> " + userId + "<br>" +
+                           "<b>Ticket_Price:</b> " + ticketCount +"</html>");
             } else {
                 SL.setText("No event found with Event ID: " + eventId);
             }
@@ -292,6 +319,31 @@ public class First_Page extends javax.swing.JFrame {
         me.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton9ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // TODO add your handling code here:
+        Brows_by_Category_and_Buy bbc= new Brows_by_Category_and_Buy(User_Name,id,"Music");
+        bbc.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        // TODO add your handling code here:
+        Brows_by_Category_and_Buy bbc= new Brows_by_Category_and_Buy(User_Name,id,"Art");
+        bbc.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+        // TODO add your handling code here:
+        Brows_by_Category_and_Buy bbc= new Brows_by_Category_and_Buy(User_Name,id,"Family");
+        bbc.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButton8ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments

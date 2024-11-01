@@ -1,20 +1,22 @@
 package User;
 import java.sql.*;
 
-// Abstract class representing an event with ticket count
+// Abstract class representing an event with ticket count and ticket price
 abstract class Event {
     protected String eventName;
     protected String eventDate;
     protected String eventDescription;
     protected String userId;
-    protected int ticketCount;  // New field for ticket count
+    protected int ticketCount;
+    protected double ticketPrice; // New field for ticket price
 
-    public Event(String eventName, String eventDate, String eventDescription, String userId, int ticketCount) {
+    public Event(String eventName, String eventDate, String eventDescription, String userId, int ticketCount, double ticketPrice) {
         this.eventName = eventName;
         this.eventDate = eventDate;
         this.eventDescription = eventDescription;
         this.userId = userId;
         this.ticketCount = ticketCount;
+        this.ticketPrice = ticketPrice;
     }
 
     public abstract void saveEvent();
@@ -22,22 +24,23 @@ abstract class Event {
 
 // Music Event
 class MusicEvent extends Event {
-    public MusicEvent(String eventName, String eventDate, String eventDescription, String userId, int ticketCount) {
-        super(eventName, eventDate, eventDescription, userId, ticketCount);
+    public MusicEvent(String eventName, String eventDate, String eventDescription, String userId, int ticketCount, double ticketPrice) {
+        super(eventName, eventDate, eventDescription, userId, ticketCount, ticketPrice);
     }
 
     @Override
     public void saveEvent() {
         try {
             Connection con = DatabaseConnection.getInstance().getConnection();
-            String insertQuery = "INSERT INTO Events (Event_Name, Event_Type, Event_Date, Event_Description, Ticket_Count, User_ID) VALUES (?, ?, ?, ?, ?, ?)";
+            String insertQuery = "INSERT INTO Events (Event_Name, Event_Type, Event_Date, Event_Description, Ticket_Count, Ticket_Price, User_ID) VALUES (?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement pstmt = con.prepareStatement(insertQuery)) {
                 pstmt.setString(1, eventName);
                 pstmt.setString(2, "Music");
                 pstmt.setString(3, eventDate);
                 pstmt.setString(4, eventDescription);
                 pstmt.setInt(5, ticketCount);
-                pstmt.setString(6, userId);
+                pstmt.setDouble(6, ticketPrice);
+                pstmt.setString(7, userId);
                 pstmt.executeUpdate();
                 System.out.println("Music event saved successfully!");
             }
@@ -49,22 +52,23 @@ class MusicEvent extends Event {
 
 // Sports Event
 class SportsEvent extends Event {
-    public SportsEvent(String eventName, String eventDate, String eventDescription, String userId, int ticketCount) {
-        super(eventName, eventDate, eventDescription, userId, ticketCount);
+    public SportsEvent(String eventName, String eventDate, String eventDescription, String userId, int ticketCount, double ticketPrice) {
+        super(eventName, eventDate, eventDescription, userId, ticketCount, ticketPrice);
     }
 
     @Override
     public void saveEvent() {
         try {
             Connection con = DatabaseConnection.getInstance().getConnection();
-            String insertQuery = "INSERT INTO Events (Event_Name, Event_Type, Event_Date, Event_Description, Ticket_Count, User_ID) VALUES (?, ?, ?, ?, ?, ?)";
+            String insertQuery = "INSERT INTO Events (Event_Name, Event_Type, Event_Date, Event_Description, Ticket_Count, Ticket_Price, User_ID) VALUES (?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement pstmt = con.prepareStatement(insertQuery)) {
                 pstmt.setString(1, eventName);
                 pstmt.setString(2, "Sports");
                 pstmt.setString(3, eventDate);
                 pstmt.setString(4, eventDescription);
                 pstmt.setInt(5, ticketCount);
-                pstmt.setString(6, userId);
+                pstmt.setDouble(6, ticketPrice);
+                pstmt.setString(7, userId);
                 pstmt.executeUpdate();
                 System.out.println("Sports event saved successfully!");
             }
@@ -76,22 +80,23 @@ class SportsEvent extends Event {
 
 // Art Event
 class ArtEvent extends Event {
-    public ArtEvent(String eventName, String eventDate, String eventDescription, String userId, int ticketCount) {
-        super(eventName, eventDate, eventDescription, userId, ticketCount);
+    public ArtEvent(String eventName, String eventDate, String eventDescription, String userId, int ticketCount, double ticketPrice) {
+        super(eventName, eventDate, eventDescription, userId, ticketCount, ticketPrice);
     }
 
     @Override
     public void saveEvent() {
         try {
             Connection con = DatabaseConnection.getInstance().getConnection();
-            String insertQuery = "INSERT INTO Events (Event_Name, Event_Type, Event_Date, Event_Description, Ticket_Count, User_ID) VALUES (?, ?, ?, ?, ?, ?)";
+            String insertQuery = "INSERT INTO Events (Event_Name, Event_Type, Event_Date, Event_Description, Ticket_Count, Ticket_Price, User_ID) VALUES (?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement pstmt = con.prepareStatement(insertQuery)) {
                 pstmt.setString(1, eventName);
                 pstmt.setString(2, "Art");
                 pstmt.setString(3, eventDate);
                 pstmt.setString(4, eventDescription);
                 pstmt.setInt(5, ticketCount);
-                pstmt.setString(6, userId);
+                pstmt.setDouble(6, ticketPrice);
+                pstmt.setString(7, userId);
                 pstmt.executeUpdate();
                 System.out.println("Art event saved successfully!");
             }
@@ -103,22 +108,23 @@ class ArtEvent extends Event {
 
 // Family Event
 class FamilyEvent extends Event {
-    public FamilyEvent(String eventName, String eventDate, String eventDescription, String userId, int ticketCount) {
-        super(eventName, eventDate, eventDescription, userId, ticketCount);
+    public FamilyEvent(String eventName, String eventDate, String eventDescription, String userId, int ticketCount, double ticketPrice) {
+        super(eventName, eventDate, eventDescription, userId, ticketCount, ticketPrice);
     }
 
     @Override
     public void saveEvent() {
         try {
             Connection con = DatabaseConnection.getInstance().getConnection();
-            String insertQuery = "INSERT INTO Events (Event_Name, Event_Type, Event_Date, Event_Description, Ticket_Count, User_ID) VALUES (?, ?, ?, ?, ?, ?)";
+            String insertQuery = "INSERT INTO Events (Event_Name, Event_Type, Event_Date, Event_Description, Ticket_Count, Ticket_Price, User_ID) VALUES (?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement pstmt = con.prepareStatement(insertQuery)) {
                 pstmt.setString(1, eventName);
                 pstmt.setString(2, "Family");
                 pstmt.setString(3, eventDate);
                 pstmt.setString(4, eventDescription);
                 pstmt.setInt(5, ticketCount);
-                pstmt.setString(6, userId);
+                pstmt.setDouble(6, ticketPrice);
+                pstmt.setString(7, userId);
                 pstmt.executeUpdate();
                 System.out.println("Family event saved successfully!");
             }
@@ -130,19 +136,18 @@ class FamilyEvent extends Event {
 
 // Factory class
 public class EventFactory {
-    public static Event createEvent(String type, String eventName, String eventDate, String eventDescription, String userId, int ticketCount) {
+    public static Event createEvent(String type, String eventName, String eventDate, String eventDescription, String userId, int ticketCount, double ticketPrice) {
         switch (type) {
             case "Music":
-                return new MusicEvent(eventName, eventDate, eventDescription, userId, ticketCount);
+                return new MusicEvent(eventName, eventDate, eventDescription, userId, ticketCount, ticketPrice);
             case "Sports":
-                return new SportsEvent(eventName, eventDate, eventDescription, userId, ticketCount);
+                return new SportsEvent(eventName, eventDate, eventDescription, userId, ticketCount, ticketPrice);
             case "Art":
-                return new ArtEvent(eventName, eventDate, eventDescription, userId, ticketCount);
+                return new ArtEvent(eventName, eventDate, eventDescription, userId, ticketCount, ticketPrice);
             case "Family":
-                return new FamilyEvent(eventName, eventDate, eventDescription, userId, ticketCount);
+                return new FamilyEvent(eventName, eventDate, eventDescription, userId, ticketCount, ticketPrice);
             default:
                 throw new IllegalArgumentException("Unknown event type: " + type);
         }
     }
 }
-
