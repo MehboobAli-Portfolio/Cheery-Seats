@@ -337,7 +337,24 @@ public class Brows_by_Category_and_Buy extends javax.swing.JFrame {
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         // TODO add your handling code here:
-        
+         int selectedRow = jTable1.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select an event to purchase a ticket!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Get Event ID and User ID
+        int eventId = (int) jTable1.getValueAt(selectedRow, 0); // Assuming Event_ID is in column 0
+        int userId = Integer.parseInt(id); // Use the logged-in user's ID
+
+        // Purchase Ticket
+        TicketPurchase ticketPurchase = new TicketPurchase();
+        boolean success = ticketPurchase.purchaseTicket(eventId, userId);
+
+        if (success) {
+            JOptionPane.showMessageDialog(this, "Ticket purchased successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            jButton1ActionPerformed(null); // Refresh the table
+        }
     }//GEN-LAST:event_jButton5ActionPerformed
 
     /**

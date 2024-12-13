@@ -189,13 +189,12 @@ public class First_Page extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel8)
-                        .addComponent(jButton4)
-                        .addComponent(jButton9)
-                        .addComponent(jButton2)))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel8)
+                    .addComponent(jButton4)
+                    .addComponent(jButton9)
+                    .addComponent(jButton2)
+                    .addComponent(jButton3))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -274,7 +273,13 @@ public class First_Page extends javax.swing.JFrame {
         SL.setText("Event ID cannot be empty.");
         return;
     }
-
+    try {
+    int id = Integer.parseInt(eventId); // Validate that eventId is an integer
+    // Proceed with your logic using the id
+    } catch (NumberFormatException e) {
+        SL.setText("Event ID must be an integer.");
+        return;
+    }
     try {
         // Use Singleton instance for database connection
         Connection con = DatabaseConnection.getInstance().getConnection();
