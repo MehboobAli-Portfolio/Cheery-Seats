@@ -3,6 +3,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.JOptionPane;
 
 public class Notification {
     public void notifyOrganizer(int eventId) {
@@ -17,10 +18,10 @@ public class Notification {
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 String organizerEmail = rs.getString("User_Email");
-                System.out.println("Notification sent to organizer: " + organizerEmail);
+                JOptionPane.showMessageDialog(null,"Notification sent to organizer: " + organizerEmail);
                 // Integrate actual email service here for real notifications (e.g., using JavaMail API)
             } else {
-                System.out.println("No organizer found for the event ID: " + eventId);
+                JOptionPane.showMessageDialog(null,"No organizer found for the event ID: " + eventId);
             }
         } catch (SQLException e) {
             e.printStackTrace();
