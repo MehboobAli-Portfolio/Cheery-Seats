@@ -4,29 +4,68 @@
  */
 package User;
 import java.sql.*;
-import javax.swing.AbstractAction.*;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author mehbo
  */
-public class Brows_by_Category_and_Buy extends javax.swing.JFrame {
+public class My_Ticket extends javax.swing.JFrame {
+
+    /**
+     * Creates new form NewJFrame
+     */
     String User_Name;
     String id;
-    String category;
-    Brows_by_Category_and_Buy(String User_name,String id,String category)
-    {
+    public My_Ticket(String User_name,String id) {
         this.User_Name=User_name;
         this.id=id;
-        this.category = category;
         initComponents();
         jLabel1.setText("User_Name:"+User_Name);
         jLabel2.setText("ID:"+id);
-        
     }
-    public Brows_by_Category_and_Buy() {
+    public My_Ticket() {
         initComponents();
+    }
+    private void showTickets() {
+        try {
+            Connection con = DatabaseConnection.getInstance().getConnection();
+            String query = """
+                SELECT t.Event_ID, e.Event_Name, e.Event_Date, e.Event_Description, e.Ticket_Price
+                FROM Tickets t
+                JOIN Events e ON t.Event_ID = e.Event_ID
+                WHERE t.User_ID = ?
+            """;
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, Integer.parseInt(id));
+            ResultSet rs = pstmt.executeQuery();
+
+            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+            model.setRowCount(0);
+
+            while (rs.next()) {
+                Object[] row = {
+                    rs.getInt("Event_ID"),
+                    rs.getString("Event_Name"),
+                    rs.getDate("Event_Date"),
+                    rs.getString("Event_Description"),
+                    rs.getDouble("Ticket_Price")
+                };
+                model.addRow(row);
+            }
+
+            if (model.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(this, "You have not purchased any tickets.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            }
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error fetching tickets: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void clearTable() {
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0);
     }
 
     /**
@@ -39,21 +78,23 @@ public class Brows_by_Category_and_Buy extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jButton9 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jLabel8 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(0, 204, 204));
+
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel8.setText("Cheery Seats");
 
         jButton3.setText("Home");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -75,16 +116,6 @@ public class Brows_by_Category_and_Buy extends javax.swing.JFrame {
                 jButton9ActionPerformed(evt);
             }
         });
-
-        jButton2.setText("My Tickets");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
-
-        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel8.setText("Cheery Seats");
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -202,10 +233,10 @@ public class Brows_by_Category_and_Buy extends javax.swing.JFrame {
             }
         });
 
-        jButton5.setText("Select and buy ");
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
+        jButton2.setText("Clear");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
+                jButton2ActionPerformed(evt);
             }
         });
 
@@ -214,60 +245,60 @@ public class Brows_by_Category_and_Buy extends javax.swing.JFrame {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(19, 19, 19)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(40, 40, 40)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jButton5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 608, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jButton2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel8)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(7, 7, 7)
-                        .addComponent(jButton4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton9)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(31, Short.MAX_VALUE))
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 608, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(22, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addGap(12, 12, 12)
+                    .addComponent(jLabel8)
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(7, 7, 7)
+                    .addComponent(jButton4)
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jButton9)
+                    .addContainerGap(262, Short.MAX_VALUE)))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(9, 9, 9)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8)
-                    .addComponent(jButton4)
-                    .addComponent(jButton9)
-                    .addComponent(jButton2)
-                    .addComponent(jButton3))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(0, 47, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 342, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton5)
-                    .addComponent(jButton1))
-                .addContainerGap(36, Short.MAX_VALUE))
+                    .addComponent(jButton1)
+                    .addComponent(jButton2))
+                .addContainerGap())
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel8)
+                        .addComponent(jButton4)
+                        .addComponent(jButton9)
+                        .addComponent(jButton3))
+                    .addContainerGap(428, Short.MAX_VALUE)))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -277,7 +308,6 @@ public class Brows_by_Category_and_Buy extends javax.swing.JFrame {
         );
 
         pack();
-        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -303,70 +333,12 @@ public class Brows_by_Category_and_Buy extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        try {
-        // Establish database connection
-        Connection con = DatabaseConnection.getInstance().getConnection();
-
-        // SQL query to retrieve events with the creator's name
-        String query = "SELECT e.Event_ID, e.Event_Name, e.Event_Date, e.Event_Description, e.Ticket_Price, u.User_Name AS Creator_Name " +
-                       "FROM Events e " +
-                       "JOIN User u ON e.User_ID = u.User_ID " + // Adjust based on your actual column names
-                       "WHERE e.Event_Type = ?";
-        PreparedStatement pstmt = con.prepareStatement(query);
-        pstmt.setString(1, category);  // Set the category to filter by the chosen event type
-
-        // Execute query and get results
-        ResultSet rs = pstmt.executeQuery();
-
-        // Clear any existing rows in the table
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        model.setRowCount(0);
-
-        // Populate the table with event data
-        while (rs.next()) {
-            Object[] row = {
-                rs.getInt("Event_ID"),
-                rs.getString("Creator_Name"),  // Getting the creator's name from the Users table
-                rs.getString("Event_Name"),
-                rs.getDate("Event_Date"),
-                rs.getString("Event_Description"),
-                rs.getDouble("Ticket_Price")
-            };
-            model.addRow(row);
-        }
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, "Error retrieving events: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
-    }
-
+        showTickets();
     }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        // TODO add your handling code here:
-         int selectedRow = jTable1.getSelectedRow();
-        if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, "Please select an event to purchase a ticket!", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        // Get Event ID and User ID
-        int eventId = (int) jTable1.getValueAt(selectedRow, 0); // Assuming Event_ID is in column 0
-        int userId = Integer.parseInt(id); // Use the logged-in user's ID
-
-        // Purchase Ticket
-        TicketPurchase ticketPurchase = new TicketPurchase();
-        boolean success = ticketPurchase.purchaseTicket(eventId, userId);
-
-        if (success) {
-            JOptionPane.showMessageDialog(this, "Ticket purchased successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            jButton1ActionPerformed(null); // Refresh the table
-        }
-    }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        My_Ticket mt=new My_Ticket(User_Name,id);
-        mt.setVisible(true);
-        this.dispose();
+        clearTable();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
@@ -386,13 +358,13 @@ public class Brows_by_Category_and_Buy extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Brows_by_Category_and_Buy.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(My_Ticket.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Brows_by_Category_and_Buy.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(My_Ticket.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Brows_by_Category_and_Buy.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(My_Ticket.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Brows_by_Category_and_Buy.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(My_Ticket.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
         //</editor-fold>
@@ -400,7 +372,7 @@ public class Brows_by_Category_and_Buy extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Brows_by_Category_and_Buy().setVisible(true);
+                new My_Ticket().setVisible(true);
             }
         });
     }
@@ -410,7 +382,6 @@ public class Brows_by_Category_and_Buy extends javax.swing.JFrame {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton9;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
