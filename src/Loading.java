@@ -1,4 +1,3 @@
-
 import User.*;
 
 public class Loading extends javax.swing.JFrame {
@@ -152,4 +151,3 @@ public class Loading extends javax.swing.JFrame {
     // Variables declaration - do not modify                     
     // End of variables declaration                   
 }
-
