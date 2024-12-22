@@ -28,40 +28,58 @@ public class My_Ticket extends javax.swing.JFrame {
         initComponents();
     }
     private void showTickets() {
-        try {
-            Connection con = DatabaseConnection.getInstance().getConnection();
-            String query = """
-                SELECT t.Event_ID, e.Event_Name, e.Event_Date, e.Event_Description, e.Ticket_Price
-                FROM Tickets t
-                JOIN Events e ON t.Event_ID = e.Event_ID
-                WHERE t.User_ID = ?
-            """;
-            PreparedStatement pstmt = con.prepareStatement(query);
-            pstmt.setInt(1, Integer.parseInt(id));
-            ResultSet rs = pstmt.executeQuery();
+        // Start a new background thread for fetching and displaying tickets
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    // Establish database connection
+                    Connection con = DatabaseConnection.getInstance().getConnection();
+                    String query = """
+                        SELECT t.Event_ID, e.Event_Name, e.Event_Date, e.Event_Description, e.Ticket_Price
+                        FROM Tickets t
+                        JOIN Events e ON t.Event_ID = e.Event_ID
+                        WHERE t.User_ID = ?
+                    """;
+                    PreparedStatement pstmt = con.prepareStatement(query);
+                    pstmt.setInt(1, Integer.parseInt(id));
+                    ResultSet rs = pstmt.executeQuery();
 
-            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-            model.setRowCount(0);
+                    // Use SwingUtilities to update the UI on the Event Dispatch Thread (EDT)
+                    SwingUtilities.invokeLater(() -> {
+                        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+                        model.setRowCount(0); // Clear any existing rows in the table
 
-            while (rs.next()) {
-                Object[] row = {
-                    rs.getInt("Event_ID"),
-                    rs.getString("Event_Name"),
-                    rs.getDate("Event_Date"),
-                    rs.getString("Event_Description"),
-                    rs.getDouble("Ticket_Price")
-                };
-                model.addRow(row);
+                        try {
+                            while (rs.next()) {
+                                Object[] row = {
+                                    rs.getInt("Event_ID"),
+                                    rs.getString("Event_Name"),
+                                    rs.getDate("Event_Date"),
+                                    rs.getString("Event_Description"),
+                                    rs.getDouble("Ticket_Price")
+                                };
+                                model.addRow(row);
+                            }
+
+                            // Check if no rows were added to the table
+                            if (model.getRowCount() == 0) {
+                                JOptionPane.showMessageDialog(null, "You have not purchased any tickets.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                            }
+                        } catch (SQLException e) {
+                            JOptionPane.showMessageDialog(null, "Error processing ticket data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    });
+                } catch (SQLException e) {
+                    // Handle SQL exceptions in the background thread
+                    SwingUtilities.invokeLater(() -> {
+                        JOptionPane.showMessageDialog(null, "Error fetching tickets: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    });
+                }
             }
-
-            if (model.getRowCount() == 0) {
-                JOptionPane.showMessageDialog(this, "You have not purchased any tickets.", "Info", JOptionPane.INFORMATION_MESSAGE);
-            }
-
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error fetching tickets: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        }).start(); // Start the background thread
     }
+
 
     private void clearTable() {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();

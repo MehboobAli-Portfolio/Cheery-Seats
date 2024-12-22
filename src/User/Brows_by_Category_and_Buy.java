@@ -6,6 +6,7 @@ package User;
 import java.sql.*;
 import javax.swing.AbstractAction.*;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 /**
  *
@@ -302,64 +303,87 @@ public class Brows_by_Category_and_Buy extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton9ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        try {
-        // Establish database connection
-        Connection con = DatabaseConnection.getInstance().getConnection();
+    // Start a new thread for retrieving and displaying events
+    new Thread(new Runnable() {
+        @Override
+        public void run() {
+            try {
+                // Establish database connection
+                Connection con = DatabaseConnection.getInstance().getConnection();
 
-        // SQL query to retrieve events with the creator's name
-        String query = "SELECT e.Event_ID, e.Event_Name, e.Event_Date, e.Event_Description, e.Ticket_Price, u.User_Name AS Creator_Name " +
-                       "FROM Events e " +
-                       "JOIN User u ON e.User_ID = u.User_ID " + // Adjust based on your actual column names
-                       "WHERE e.Event_Type = ?";
-        PreparedStatement pstmt = con.prepareStatement(query);
-        pstmt.setString(1, category);  // Set the category to filter by the chosen event type
+                // SQL query to retrieve events with the creator's name
+                String query = "SELECT e.Event_ID, e.Event_Name, e.Event_Date, e.Event_Description, e.Ticket_Price, u.User_Name AS Creator_Name " +
+                               "FROM Events e " +
+                               "JOIN User u ON e.User_ID = u.User_ID " + // Adjust based on your actual column names
+                               "WHERE e.Event_Type = ?";
+                PreparedStatement pstmt = con.prepareStatement(query);
+                pstmt.setString(1, category);  // Set the category to filter by the chosen event type
 
-        // Execute query and get results
-        ResultSet rs = pstmt.executeQuery();
+                // Execute query and get results
+                ResultSet rs = pstmt.executeQuery();
 
-        // Clear any existing rows in the table
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        model.setRowCount(0);
+                // Clear any existing rows in the table
+                DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+                model.setRowCount(0);
 
-        // Populate the table with event data
-        while (rs.next()) {
-            Object[] row = {
-                rs.getInt("Event_ID"),
-                rs.getString("Creator_Name"),  // Getting the creator's name from the Users table
-                rs.getString("Event_Name"),
-                rs.getDate("Event_Date"),
-                rs.getString("Event_Description"),
-                rs.getDouble("Ticket_Price")
-            };
-            model.addRow(row);
+                // Populate the table with event data
+                while (rs.next()) {
+                    Object[] row = {
+                        rs.getInt("Event_ID"),
+                        rs.getString("Creator_Name"),  // Getting the creator's name from the Users table
+                        rs.getString("Event_Name"),
+                        rs.getDate("Event_Date"),
+                        rs.getString("Event_Description"),
+                        rs.getDouble("Ticket_Price")
+                    };
+                    model.addRow(row);
+                }
+
+            } catch (SQLException e) {
+                // Handle exception and update UI with error message
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(null, "Error retrieving events: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+                });
+            }
         }
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, "Error retrieving events: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
-    }
+    }).start(); // Start the new thread
+
+
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        // TODO add your handling code here:
-         int selectedRow = jTable1.getSelectedRow();
-        if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, "Please select an event to purchase a ticket!", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+    // Start a new thread for ticket purchase process
+    new Thread(new Runnable() {
+        @Override
+        public void run() {
+            int selectedRow = jTable1.getSelectedRow();
+            if (selectedRow == -1) {
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(null, "Please select an event to purchase a ticket!", "Error", JOptionPane.ERROR_MESSAGE);
+                });
+                return;
+            }
+
+            // Get Event ID and User ID
+            int eventId = (int) jTable1.getValueAt(selectedRow, 0); // Assuming Event_ID is in column 0
+            int userId = Integer.parseInt(id); // Use the logged-in user's ID
+
+            // Create TicketPurchase object and purchase ticket
+            TicketPurchase ticketPurchase = new TicketPurchase();
+            boolean success = ticketPurchase.purchaseTicket(eventId, userId);
+
+            // Handle success or failure in the UI thread
+            SwingUtilities.invokeLater(() -> {
+                if (success) {
+                    JOptionPane.showMessageDialog(null, "Ticket purchased successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    jButton1ActionPerformed(null); // Refresh the table after purchase
+                } else {
+                    JOptionPane.showMessageDialog(null, "Ticket purchase failed. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            });
         }
-
-        // Get Event ID and User ID
-        int eventId = (int) jTable1.getValueAt(selectedRow, 0); // Assuming Event_ID is in column 0
-        int userId = Integer.parseInt(id); // Use the logged-in user's ID
-
-        // Purchase Ticket
-        TicketPurchase ticketPurchase = new TicketPurchase();
-        boolean success = ticketPurchase.purchaseTicket(eventId, userId);
-
-        if (success) {
-            JOptionPane.showMessageDialog(this, "Ticket purchased successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            jButton1ActionPerformed(null); // Refresh the table
-        }
+    }).start(); // Start the background thread
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed

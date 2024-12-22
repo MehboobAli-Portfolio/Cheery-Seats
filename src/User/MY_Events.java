@@ -29,6 +29,58 @@ public class MY_Events extends javax.swing.JFrame {
     public MY_Events() {
         initComponents();
     }
+    
+    private void deleteEvent() {
+        int selectedRow = jTable1.getSelectedRow(); // Get selected row index
+
+        if (selectedRow != -1) { // Check if a row is selected
+            int eventId = (Integer) jTable1.getValueAt(selectedRow, 0); // Get Event_ID from selected row
+
+            // Confirm deletion
+            int confirm = JOptionPane.showConfirmDialog(this, 
+                    "Are you sure you want to delete this event?", 
+                    "Confirm Delete", 
+                    JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                // Start a new thread to handle the deletion operation
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            // Get the database connection
+                            Connection con = DatabaseConnection.getInstance().getConnection();
+
+                            // SQL query to delete the event
+                            String deleteQuery = "DELETE FROM Events WHERE Event_ID = ?";
+                            PreparedStatement pstmt = con.prepareStatement(deleteQuery);
+                            pstmt.setInt(1, eventId); // Set the Event_ID to delete
+
+                            int rowsAffected = pstmt.executeUpdate(); // Execute the delete command
+
+                            // Update UI on the Event Dispatch Thread (EDT)
+                            SwingUtilities.invokeLater(() -> {
+                                if (rowsAffected > 0) {
+                                    JOptionPane.showMessageDialog(null, "Event deleted successfully.", "Delete Successful", JOptionPane.INFORMATION_MESSAGE);
+                                    jButton1ActionPerformed(null); // Refresh the table
+                                } else {
+                                    JOptionPane.showMessageDialog(null, "Error deleting event.", "Delete Failed", JOptionPane.ERROR_MESSAGE);
+                                }
+                            });
+                        } catch (SQLException e) {
+                            // Handle SQL errors
+                            SwingUtilities.invokeLater(() -> {
+                                JOptionPane.showMessageDialog(null, "Database Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                            });
+                        }
+                    }
+                }).start(); // Start the background thread
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select an event to delete.", "No Selection", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -309,39 +361,52 @@ public class MY_Events extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        try {
-          // Get the database connection
-          Connection con = DatabaseConnection.getInstance().getConnection();
+    // Start a new thread to handle the event retrieval operation
+    new Thread(new Runnable() {
+        @Override
+        public void run() {
+            try {
+                // Get the database connection
+                Connection con = DatabaseConnection.getInstance().getConnection();
 
-          // SQL query to retrieve events created by the current user
-          String query = "SELECT Event_ID, Event_Name, Event_Type, Event_Date, Event_Description, User_ID, Ticket_Count, Ticket_Price FROM Events WHERE User_ID = ?";
-          PreparedStatement pstmt = con.prepareStatement(query);
-          pstmt.setString(1, id);  // Use the user's ID to filter events
+                // SQL query to retrieve events created by the current user
+                String query = "SELECT Event_ID, Event_Name, Event_Type, Event_Date, Event_Description, User_ID, Ticket_Count, Ticket_Price FROM Events WHERE User_ID = ?";
+                PreparedStatement pstmt = con.prepareStatement(query);
+                pstmt.setString(1, id);  // Use the user's ID to filter events
 
-          ResultSet rs = pstmt.executeQuery();
+                ResultSet rs = pstmt.executeQuery();
 
-          // Set up table model
-          DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-          model.setRowCount(0); // Clear existing rows
+                // Set up table model
+                DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
 
-          // Loop through the result set and add rows to the table
-          while (rs.next()) {
-              Object[] row = {
-                  rs.getInt("Event_ID"),
-                  rs.getString("Event_Name"),
-                  rs.getString("Event_Type"),
-                  rs.getDate("Event_Date"),
-                  rs.getString("Event_Description"),
-                  rs.getString("User_ID"),
-                  rs.getInt("Ticket_Count"),
-                  rs.getDouble("Ticket_Price")  // Corrected type to double for ticket price
-              };
-              model.addRow(row);
-          }
-      } catch (SQLException e) {
-          JOptionPane.showMessageDialog(this, "Error retrieving events: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
-      }
+                // Clear any existing rows in the table before adding new data
+                SwingUtilities.invokeLater(() -> model.setRowCount(0));
 
+                // Loop through the result set and add rows to the table
+                while (rs.next()) {
+                    final Object[] row = {
+                        rs.getInt("Event_ID"),
+                        rs.getString("Event_Name"),
+                        rs.getString("Event_Type"),
+                        rs.getDate("Event_Date"),
+                        rs.getString("Event_Description"),
+                        rs.getString("User_ID"),
+                        rs.getInt("Ticket_Count"),
+                        rs.getDouble("Ticket_Price")  // Corrected type to double for ticket price
+                    };
+
+                    // Add rows to the table in the Event Dispatch Thread
+                    SwingUtilities.invokeLater(() -> model.addRow(row));
+                }
+
+            } catch (SQLException e) {
+                // Show error message on the Event Dispatch Thread
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(null, "Error retrieving events: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+                });
+            }
+        }
+    }).start(); // Start the background thread for loading events
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
@@ -354,43 +419,7 @@ public class MY_Events extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        // TODO add your handling code here:
-        int selectedRow = jTable1.getSelectedRow(); // Get selected row index
-
-        if (selectedRow != -1) { // Check if a row is selected
-            int eventId = (Integer) jTable1.getValueAt(selectedRow, 0); // Get Event_ID from selected row
-
-            // Confirm deletion
-            int confirm = JOptionPane.showConfirmDialog(this, 
-                    "Are you sure you want to delete this event?", 
-                    "Confirm Delete", 
-                    JOptionPane.YES_NO_OPTION);
-
-            if (confirm == JOptionPane.YES_OPTION) {
-                try {
-                    // Get the database connection
-                    Connection con = DatabaseConnection.getInstance().getConnection();
-
-                    // SQL query to delete the event
-                    String deleteQuery = "DELETE FROM Events WHERE Event_ID = ?";
-                    PreparedStatement pstmt = con.prepareStatement(deleteQuery);
-                    pstmt.setInt(1, eventId); // Set the Event_ID to delete
-
-                    int rowsAffected = pstmt.executeUpdate(); // Execute the delete command
-
-                    if (rowsAffected > 0) {
-                        JOptionPane.showMessageDialog(this, "Event deleted successfully.", "Delete Successful", JOptionPane.INFORMATION_MESSAGE);
-                        jButton1ActionPerformed(evt); // Refresh the table
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Error deleting event.", "Delete Failed", JOptionPane.ERROR_MESSAGE);
-                    }
-                } catch (SQLException e) {
-                    JOptionPane.showMessageDialog(this, "Database Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "Please select an event to delete.", "No Selection", JOptionPane.WARNING_MESSAGE);
-        }
+        deleteEvent();        
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed

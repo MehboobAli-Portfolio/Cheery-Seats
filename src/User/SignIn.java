@@ -141,36 +141,62 @@ public class SignIn extends javax.swing.JFrame {
     String username = jTextField2.getText().trim();
     String password = jPasswordField1.getText().trim();
 
+    // Clear previous error messages and validation flags
+    boolean isValid = true;
+    StringBuilder validationMessage = new StringBuilder();
+
     if (username.isEmpty() || password.isEmpty()) {
+        isValid = false;
         JOptionPane.showMessageDialog(this, "Username and Password cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
     }
 
-    try {
-        // Use Singleton instance for database connection
-        Connection con = DatabaseConnection.getInstance().getConnection();
-        
-        String query = "SELECT User_ID, User_Name FROM User WHERE User_Name = ? AND Password = ?";
-        try (PreparedStatement pstmt = con.prepareStatement(query)) {
-            pstmt.setString(1, username);
-            pstmt.setString(2, password);
-            ResultSet rs = pstmt.executeQuery();
+    // If input validation passes
+    if (isValid) {
+        // Disable the sign-in button
+        JButton signInButton = jButton1; // Replace with your actual sign-in button reference
+        signInButton.setEnabled(false);
 
-            if (rs.next()) {
-                String id = rs.getString("User_ID");  // Retrieve the User_ID
-                JOptionPane.showMessageDialog(this, "Sign-in successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+        // Create a new thread for background processing
+        Thread signInThread = new Thread(() -> {
+            try {
+                // Use Singleton instance for database connection
+                Connection con = DatabaseConnection.getInstance().getConnection();
 
-                // Pass both username and ID to First_Page
-                First_Page fp = new First_Page(username, id);
-                fp.setVisible(true);
-                this.dispose();
-            } else {
-                JOptionPane.showMessageDialog(this, "Invalid username or password.", "Error", JOptionPane.ERROR_MESSAGE);
+                String query = "SELECT User_ID, User_Name FROM User WHERE User_Name = ? AND Password = ?";
+                try (PreparedStatement pstmt = con.prepareStatement(query)) {
+                    pstmt.setString(1, username);
+                    pstmt.setString(2, password);
+                    ResultSet rs = pstmt.executeQuery();
+
+                    if (rs.next()) {
+                        String id = rs.getString("User_ID");  // Retrieve the User_ID
+                        SwingUtilities.invokeLater(() -> {
+                            JOptionPane.showMessageDialog(null, "Sign-in successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+                            // Pass both username and ID to First_Page
+                            First_Page fp = new First_Page(username, id);
+                            fp.setVisible(true);
+                            dispose();
+                        });
+                    } else {
+                        SwingUtilities.invokeLater(() -> 
+                            JOptionPane.showMessageDialog(null, "Invalid username or password.", "Error", JOptionPane.ERROR_MESSAGE)
+                        );
+                    }
+                }
+            } catch (SQLException e) {
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(null, "SQL Exception: " + e.getMessage());
+                    JOptionPane.showMessageDialog(null, "Database connection error. Please try again later.", "Error", JOptionPane.ERROR_MESSAGE);
+                });
+            } finally {
+                // Re-enable the sign-in button in the EDT
+                SwingUtilities.invokeLater(() -> signInButton.setEnabled(true));
             }
-        }
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this,"SQL Exception: " + e.getMessage());
-        JOptionPane.showMessageDialog(this, "Database connection error. Please try again later.", "Error", JOptionPane.ERROR_MESSAGE);
+        });
+
+        // Start the thread
+        signInThread.start();
     }
 
     }//GEN-LAST:event_jButton1ActionPerformed

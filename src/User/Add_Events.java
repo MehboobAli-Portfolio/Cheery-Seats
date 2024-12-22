@@ -250,77 +250,113 @@ public class Add_Events extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // Retrieve input values from the form fields
-        String eventName = jTextField1.getText().trim();
-        Date selectedDate = jDateChooser1.getDate();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String eventDate = selectedDate != null ? dateFormat.format(selectedDate) : "";
-        String eventDescription = jTextArea1.getText().trim();
-        String eventType = jComboBox1.getSelectedItem().toString();
-        String ticketCountStr = jTextField2.getText().trim();
-        String ticketPriceStr = jTextField3.getText().trim(); // New field for ticket price
+    // Retrieve input values from the form fields
+   String eventName = jTextField1.getText().trim();
+   Date selectedDate = jDateChooser1.getDate();
+   SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+   String eventDate = selectedDate != null ? dateFormat.format(selectedDate) : "";
+   String eventDescription = jTextArea1.getText().trim();
+   String eventType = jComboBox1.getSelectedItem().toString();
+   String ticketCountStr = jTextField2.getText().trim();
+   String ticketPriceStr = jTextField3.getText().trim(); // New field for ticket price
 
-        // Validation checks
-        StringBuilder errorMessage = new StringBuilder("Please check the following:\n");
-        boolean isValid = true;
+   // Validation checks
+   StringBuilder errorMessage = new StringBuilder("Please check the following:\n");
+   boolean isValid = true;
 
-        if (eventName.isEmpty()) {
-            isValid = false;
-            errorMessage.append("- Event Name cannot be empty.\n");
-        }
-        if (eventDate.isEmpty()) {
-            isValid = false;
-            errorMessage.append("- Event Date cannot be empty.\n");
-        }
-        if (eventDescription.isEmpty()) {
-            isValid = false;
-            errorMessage.append("- Event Description cannot be empty.\n");
-        } else if (eventDescription.length() > 1000) {
-            isValid = false;
-            errorMessage.append("- Event Description cannot exceed 1000 characters.\n");
-        }
-        int ticketCount = 0;
-        try {
-            ticketCount = Integer.parseInt(ticketCountStr);
-            if (ticketCount <= 0) {
-                isValid = false;
-                errorMessage.append("- Ticket count must be a positive integer.\n");
-            }
-        } catch (NumberFormatException e) {
-            isValid = false;
-            errorMessage.append("- Ticket count must be a valid number.\n");
-        }
+   if (eventName.isEmpty()) {
+       isValid = false;
+       errorMessage.append("- Event Name cannot be empty.\n");
+   }
+   if (eventDate.isEmpty()) {
+       isValid = false;
+       errorMessage.append("- Event Date cannot be empty.\n");
+   }
+   if (eventDescription.isEmpty()) {
+       isValid = false;
+       errorMessage.append("- Event Description cannot be empty.\n");
+   } else if (eventDescription.length() > 1000) {
+       isValid = false;
+       errorMessage.append("- Event Description cannot exceed 1000 characters.\n");
+   }
 
-        double ticketPrice = 0.0;
-        try {
-            ticketPrice = Double.parseDouble(ticketPriceStr);
-            if (ticketPrice <= 0) {
-                isValid = false;
-                errorMessage.append("- Ticket price must be a positive number.\n");
-            }
-        } catch (NumberFormatException e) {
-            isValid = false;
-            errorMessage.append("- Ticket price must be a valid number.\n");
-        }
+   int ticketCount = 0;
+   try {
+       ticketCount = Integer.parseInt(ticketCountStr);
+       if (ticketCount <= 0) {
+           isValid = false;
+           errorMessage.append("- Ticket count must be a positive integer.\n");
+       }
+   } catch (NumberFormatException e) {
+       isValid = false;
+       errorMessage.append("- Ticket count must be a valid number.\n");
+   }
 
-        // If any field is invalid, show error message
-        if (!isValid) {
-            JOptionPane.showMessageDialog(this, errorMessage.toString(), "Input Error", JOptionPane.ERROR_MESSAGE);
-            return; // Exit the method if validation fails
-        }
+   double ticketPrice = 0.0;
+   try {
+       ticketPrice = Double.parseDouble(ticketPriceStr);
+       if (ticketPrice <= 0) {
+           isValid = false;
+           errorMessage.append("- Ticket price must be a positive number.\n");
+       }
+   } catch (NumberFormatException e) {
+       isValid = false;
+       errorMessage.append("- Ticket price must be a valid number.\n");
+   }
 
-        // Create the event and save it using the Factory Pattern
-        Event event = EventFactory.createEvent(eventType, eventName, eventDate, eventDescription, id, ticketCount, ticketPrice);
-        event.saveEvent();
+   // If any field is invalid, show error message
+   if (!isValid) {
+       JOptionPane.showMessageDialog(this, errorMessage.toString(), "Input Error", JOptionPane.ERROR_MESSAGE);
+       return; // Exit the method if validation fails
+   }
 
-        // Display success message and clear form fields
-        JOptionPane.showMessageDialog(this, "Event added successfully!");
-        jTextField1.setText("");
-        jTextArea1.setText("");
-        jTextField2.setText("");
-        jTextField3.setText("");
-        jDateChooser1.setDate(null);
-       
+   // Multithreading through a custom Thread class
+   class EventCreationThread extends Thread {
+       private final String eventName;
+       private final String eventDate;
+       private final String eventDescription;
+       private final String eventType;
+       private final int ticketCount;
+       private final double ticketPrice;
+
+       public EventCreationThread(String eventName, String eventDate, String eventDescription, String eventType, int ticketCount, double ticketPrice) {
+           this.eventName = eventName;
+           this.eventDate = eventDate;
+           this.eventDescription = eventDescription;
+           this.eventType = eventType;
+           this.ticketCount = ticketCount;
+           this.ticketPrice = ticketPrice;
+       }
+
+       @Override
+       public void run() {
+           try {
+               // Create the event using the Factory Pattern
+               Event event = EventFactory.createEvent(eventType, eventName, eventDate, eventDescription, id, ticketCount, ticketPrice);
+               event.saveEvent();
+
+               // Update UI on success (needs to be done on the EDT)
+               SwingUtilities.invokeLater(() -> {
+                   JOptionPane.showMessageDialog(null, "Event added successfully!");
+                   jTextField1.setText("");
+                   jTextArea1.setText("");
+                   jTextField2.setText("");
+                   jTextField3.setText("");
+                   jDateChooser1.setDate(null);
+               });
+           } catch (Exception e) {
+               // Handle exceptions and update the UI with error messages
+               SwingUtilities.invokeLater(() -> {
+                   JOptionPane.showMessageDialog(null, "Failed to add the event: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+               });
+           }
+       }
+   }
+
+   // Start the background thread for event creation
+   EventCreationThread eventCreationThread = new EventCreationThread(eventName, eventDate, eventDescription, eventType, ticketCount, ticketPrice);
+   eventCreationThread.start();
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed

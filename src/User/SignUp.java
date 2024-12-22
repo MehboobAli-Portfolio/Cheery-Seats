@@ -4,7 +4,7 @@
  */
 package User;
 import java.sql.*;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 public class SignUp extends javax.swing.JFrame {
 
     /**
@@ -146,84 +146,103 @@ public class SignUp extends javax.swing.JFrame {
 
     private void Sign_UpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Sign_UpActionPerformed
     // Retrieve input values
-    String username = jTextField2.getText().trim();
-    String email = jTextField1.getText().trim();
-    String password = jPasswordField1.getText().trim();
-    String confirmPassword = jPasswordField2.getText().trim();
+   String username = jTextField2.getText().trim();
+   String email = jTextField1.getText().trim();
+   String password = jPasswordField1.getText().trim();
+   String confirmPassword = jPasswordField2.getText().trim();
 
-    // Validation flags
-    boolean isValid = true;
-    StringBuilder validationMessage = new StringBuilder();
+   // Validation flags
+   boolean isValid = true;
+   StringBuilder validationMessage = new StringBuilder();
 
-    // Clear previous error messages
-    UL.setText("");
-    EL.setText("");
-    PL.setText("");
+   // Clear previous error messages
+   UL.setText("");
+   EL.setText("");
+   PL.setText("");
 
-    // Validate Username: Should be between 3 and 25 alphanumeric characters
-    if (username.isEmpty()) {
-        isValid = false;
-        UL.setText("<html>Username cannot be empty.</html>");
-    } else if (!username.matches("^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]{3,25}$")) {
-        isValid = false;
-        UL.setText("<html>Username must be 3-25 characters<br> containing letters and at least one number.</html>");
-    }
+   // Validate Username: Should be between 3 and 25 alphanumeric characters
+   if (username.isEmpty()) {
+       isValid = false;
+       UL.setText("<html>Username cannot be empty.</html>");
+   } else if (!username.matches("^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]{3,25}$")) {
+       isValid = false;
+       UL.setText("<html>Username must be 3-25 characters<br> containing letters and at least one number.</html>");
+   }
 
-    // Validate Email: Must be a valid Gmail address
-    if (email.isEmpty()) {
-        isValid = false;
-        EL.setText("<html>Email field cannot be empty.</html>");
-    } else {
-        String emailRegex = "^[A-Za-z0-9]+@gmail\\.com$";
-        if (!email.matches(emailRegex)) {
-            isValid = false;
-            EL.setText("<html>Email must be a valid Gmail<br> address (e.g., example@gmail.com).</html>");
-        }
-    }
+   // Validate Email: Must be a valid Gmail address
+   if (email.isEmpty()) {
+       isValid = false;
+       EL.setText("<html>Email field cannot be empty.</html>");
+   } else {
+       String emailRegex = "^[A-Za-z0-9]+@gmail\\.com$";
+       if (!email.matches(emailRegex)) {
+           isValid = false;
+           EL.setText("<html>Email must be a valid Gmail<br> address (e.g., example@gmail.com).</html>");
+       }
+   }
 
-    // Validate Password strength
-    if (!password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$")) {
-        isValid = false;
-        PL.setText("<html>Password must have at least 8 characters:<br>• 1 lowercase & 1 uppercase letter<br>• 1 number & 1 special character</html>");
-    }
+   // Validate Password strength
+   if (!password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$")) {
+       isValid = false;
+       PL.setText("<html>Password must have at least 8 characters:<br>• 1 lowercase & 1 uppercase letter<br>• 1 number & 1 special character</html>");
+   }
 
-    // Confirm Password
-    if (!password.equals(confirmPassword)) {
-        isValid = false;
-        validationMessage.append("Passwords do not match.<br>");
-    }
+   // Confirm Password
+   if (!password.equals(confirmPassword)) {
+       isValid = false;
+       validationMessage.append("Passwords do not match.<br>");
+   }
 
-    // Check if all validations passed
-    if (isValid) {
-        try {
-            // Singleton Database Connection Instance
-            Connection con = DatabaseConnection.getInstance().getConnection();
+   // Check if all validations passed
+   if (isValid) {
+       // Disable the sign-up button
+       JToggleButton signUpButton = Sign_Up; // Replace with your actual button reference
+       signUpButton.setEnabled(false);
 
-            // Use PreparedStatement for SQL injection safety
-            String insertQuery = "INSERT INTO User (User_Name, User_Email, Password) VALUES (?, ?, ?)";
-            try (PreparedStatement pstmt = con.prepareStatement(insertQuery)) {
-                pstmt.setString(1, username);
-                pstmt.setString(2, email);
-                pstmt.setString(3, password);
-                pstmt.executeUpdate();
+       // Create a thread for database operations
+       Thread signUpThread = new Thread(() -> {
+           try {
+               // Singleton Database Connection Instance
+               Connection con = DatabaseConnection.getInstance().getConnection();
 
-                // Registration successful
-                javax.swing.JOptionPane.showMessageDialog(this, "Sign-up successful!", "Success", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-                SignIn si = new SignIn();
-                si.setVisible(true);
-                this.dispose();
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null,"SQL Exception: " + e.getMessage());
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,"Database connection error.");
-        }
-    } else {
-        // Show validation errors if any
-        if (validationMessage.length() > 0) {
-            javax.swing.JOptionPane.showMessageDialog(this, validationMessage.toString(), "Validation Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-        }
-    }
+               // Use PreparedStatement for SQL injection safety
+               String insertQuery = "INSERT INTO User (User_Name, User_Email, Password) VALUES (?, ?, ?)";
+               try (PreparedStatement pstmt = con.prepareStatement(insertQuery)) {
+                   pstmt.setString(1, username);
+                   pstmt.setString(2, email);
+                   pstmt.setString(3, password);
+                   pstmt.executeUpdate();
+
+                   // Registration successful
+                   SwingUtilities.invokeLater(() -> {
+                       JOptionPane.showMessageDialog(null, "Sign-up successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                       SignIn si = new SignIn();
+                       si.setVisible(true);
+                       dispose();
+                   });
+               } catch (SQLException e) {
+                   SwingUtilities.invokeLater(() -> 
+                       JOptionPane.showMessageDialog(null, "SQL Exception: " + e.getMessage())
+                   );
+               }
+           } catch (Exception e) {
+               SwingUtilities.invokeLater(() -> 
+                   JOptionPane.showMessageDialog(null, "Database connection error.")
+               );
+           } finally {
+               // Re-enable the sign-up button
+               SwingUtilities.invokeLater(() -> signUpButton.setEnabled(true));
+           }
+       });
+
+       // Start the thread
+       signUpThread.start();
+   } else {
+       // Show validation errors if any
+       if (validationMessage.length() > 0) {
+           JOptionPane.showMessageDialog(this, validationMessage.toString(), "Validation Error", JOptionPane.ERROR_MESSAGE);
+       }
+   }
 
 
     }//GEN-LAST:event_Sign_UpActionPerformed
